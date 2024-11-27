@@ -10,5 +10,5 @@ export interface Constants {
 	b: number;
 	epsilon: number;
 	max_steps: number;
-	h: number;
+	size: number;
 }

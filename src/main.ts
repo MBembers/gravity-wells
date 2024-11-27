@@ -9,7 +9,7 @@ const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 ctx.fillStyle = "black";
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-const h = 5;
+const size = 5;
 const dt = 0.3;
 const max_steps = 500;
 const z = 5;
@@ -18,7 +18,7 @@ const b = 0.2;
 const epsilon = 0.1;
 const masses: Mass[] = [];
 
-const constants: Constants = { dt, G, b, epsilon, max_steps, h };
+const constants: Constants = { dt, G, b, epsilon, max_steps, size };
 
 const mass1: Mass = { pos: [250, 300, z], m: 100, color: "#fa6670" };
 const mass2: Mass = { pos: [300, 100, z], m: 300, color: "#1fc7ff" };
@@ -31,10 +31,10 @@ let err_count = 0;
 let finals: number[][] = [];
 let canvas_data: ImageData;
 
-for (let i = 0; i < canvas.width; i += h) {
-	const y = i + h / 2;
-	for (let j = 0; j < canvas.height; j += h) {
-		const x = j + h / 2;
+for (let i = 0; i < canvas.width; i += size) {
+	const y = i + size / 2;
+	for (let j = 0; j < canvas.height; j += size) {
+		const x = j + size / 2;
 
 		let r = [x, y, 0];
 		const r_final = integrate(r, masses, constants, ctx);
@@ -45,7 +45,7 @@ for (let i = 0; i < canvas.width; i += h) {
 		}
 
 		ctx.fillStyle = closest.color;
-		ctx.fillRect(x - h / 2, y - h / 2, h, h);
+		ctx.fillRect(x - size / 2, y - size / 2, size, size);
 
 		finals.push(r_final);
 		count++;
