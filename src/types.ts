@@ -9,4 +9,6 @@ export interface Constants {
 	G: number;
 	b: number;
 	epsilon: number;
+	max_steps: number;
+	h: number;
 }
