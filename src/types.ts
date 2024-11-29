@@ -5,7 +5,7 @@ export interface Mass {
 }
 
 export interface Constants {
-	dt: number;
+	h: number;
 	G: number;
 	b: number;
 	epsilon: number;
