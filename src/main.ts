@@ -10,19 +10,19 @@ ctx.fillStyle = "black";
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 const size = 5;
-const dt = 0.3;
-const max_steps = 500;
-const z = 5;
+const h = 0.2;
+const max_steps = 300;
+const z = 3;
 const G = 6.674 * 10;
-const b = 0.2;
+const b = 0.1;
 const epsilon = 0.1;
 const masses: Mass[] = [];
 
-const constants: Constants = { dt, G, b, epsilon, max_steps, size };
+const constants: Constants = { h, G, b, epsilon, max_steps, size };
 
-const mass1: Mass = { pos: [250, 300, z], m: 100, color: "#fa6670" };
-const mass2: Mass = { pos: [300, 100, z], m: 300, color: "#1fc7ff" };
-const mass3: Mass = { pos: [100, 200, z], m: 100, color: "#8bfa66" };
+const mass1: Mass = { pos: [100, 200, z], m: 100, color: "#fa6670" };
+const mass2: Mass = { pos: [200, 100, z], m: 100, color: "#1fc7ff" };
+const mass3: Mass = { pos: [300, 200, z], m: 100, color: "#8bfa66" };
 
 masses.push(mass1, mass2, mass3);
 

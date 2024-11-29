@@ -65,20 +65,20 @@ export function integrate(r: number[], masses: Mass[], consts: Constants, ctx: C
 
 // dr/dt = v  dv/dt = a
 function rk4_step(x: number[], v: number[], masses: Mass[], consts: Constants): number[][] {
-	const dx_1 = mul(v, consts.dt);
-	const dv_1 = mul(calc_a(x, v, masses, consts), consts.dt);
+	const dx_1 = mul(v, consts.h);
+	const dv_1 = mul(calc_a(x, v, masses, consts), consts.h);
 	dv_1[2] = 0;
 
-	const dx_2 = mul(add(v, mul(dv_1, 1 / 2)), consts.dt);
-	const dv_2 = mul(calc_a(add(x, mul(dx_1, 1 / 2)), add(v, mul(dv_1, 1 / 2)), masses, consts), consts.dt);
+	const dx_2 = mul(add(v, mul(dv_1, 1 / 2)), consts.h);
+	const dv_2 = mul(calc_a(add(x, mul(dx_1, 1 / 2)), add(v, mul(dv_1, 1 / 2)), masses, consts), consts.h);
 	dv_2[2] = 0;
 
-	const dx_3 = mul(add(v, mul(dv_2, 1 / 2)), consts.dt);
-	const dv_3 = mul(calc_a(add(x, mul(dx_2, 1 / 2)), add(v, mul(dv_2, 1 / 2)), masses, consts), consts.dt);
+	const dx_3 = mul(add(v, mul(dv_2, 1 / 2)), consts.h);
+	const dv_3 = mul(calc_a(add(x, mul(dx_2, 1 / 2)), add(v, mul(dv_2, 1 / 2)), masses, consts), consts.h);
 	dv_3[2] = 0;
 
-	const dx_4 = mul(add(v, dv_3), consts.dt);
-	const dv_4 = mul(calc_a(add(x, dx_3), add(v, dv_3), masses, consts), consts.dt);
+	const dx_4 = mul(add(v, dv_3), consts.h);
+	const dv_4 = mul(calc_a(add(x, dx_3), add(v, dv_3), masses, consts), consts.h);
 	dv_4[2] = 0;
 
 	const dx = mul(add(dx_1, add(mul(dx_2, 2), add(mul(dx_3, 2), dx_4))), 1 / 6);
