@@ -34,30 +34,35 @@ export function closest_mass(r: number[], masses: Mass[]): Mass {
 	return closest;
 }
 
+// TODO fix adaptive step size
 export function integrate(r: number[], masses: Mass[], ctx: CanvasRenderingContext2D, draw: boolean = false): number[] {
 	if (draw) {
 		ctx.lineWidth = 1;
-		ctx.strokeStyle = "white";
+		ctx.strokeStyle = "black";
 		ctx.beginPath();
 		ctx.moveTo(r[0], r[1]);
 	}
 
-	let tol = 1;
+	let tol = 1e-2;
 	let steps = 0;
-	let t_max = 1;
+	let rejected = 0;
+	let t_max = 100;
 	let i = 0;
-	let h = 1 / 5;
+	let h = 0.4;
 
 	let t = [0];
 	let r_arr = [r];
 	let v_arr = [[0, 0, 0]];
 
-	console.log("starting integration loop");
+	// DEBUG
+	let h_tot = 0;
+
 	while (true) {
-		if (t[i] + h == t[i]) {
+		if (t[i] + h == t[i] || steps > constants.max_steps) {
+			// console.log("end", steps, rejected);
 			break;
 		}
-		if (h < 1e-10) {
+		if (h < 1e-5) {
 			console.log("stepsize too small!");
 			break;
 		}
@@ -76,37 +81,41 @@ export function integrate(r: number[], masses: Mass[], ctx: CanvasRenderingConte
 			bogacki.nodes,
 			masses
 		);
-
 		let r_diff = subtract(r_low, r_high);
 		let v_diff = subtract(v_high, v_low);
-		let err_vector = [abs(r_diff), abs(v_diff)];
+		let err_vector = [abs(r_diff), abs(v_diff), 0];
 		let err = abs(err_vector);
 
-		let curr_vector = [abs(r_arr[i]), abs(v_arr[i])];
+		let curr_vector = [abs(r_arr[i]), abs(v_arr[i]), 0];
 		let maxerr = tol * (1 + abs(curr_vector));
 
+		// if (steps % 20 == 0) {
+		// 	console.log("size: ", h);
+		// 	// console.log("curr last: ", r_arr[i], v_arr[i]);
+		// 	// console.log(t_new[0], r_low, r_high, v_low, v_high);
+		// 	console.log("err | maxerr: ", err, maxerr);
+		// }
+
 		if (err < maxerr) {
-			t.push(...t_new);
+			t.push(t_new[0]);
 			r_arr.push(r_high);
+			v_arr.push(v_high);
 			i++;
-			if (draw) ctx.lineTo(r[0], r[1]);
+			if (draw) ctx.lineTo(r_arr[i][0], r_arr[i][1]);
+			steps++;
+			h_tot += h;
+		} else {
+			rejected++;
 		}
 
 		let q = 0.8 * Math.pow(maxerr / err, 1 / bogacki.order);
 		q = Math.min(q, 4);
 		h = Math.min(q * h, t_max - t[i]);
-		steps++;
-
-		// DEBUGGING
-		if (steps > constants.max_steps) {
-			console.log("max steps reached!");
-			break;
-		}
 	}
 
 	if (draw) ctx.stroke();
 
-	return r;
+	return r_arr[r_arr.length - 1];
 }
 
 // dr/dt = v  dv/dt = a
@@ -162,16 +171,21 @@ function rk_adaptive_step(
 	let k = new Array(s).fill(0);
 	let l = new Array(s).fill(0);
 
+	// console.log("RK STEP R0, V0: ", r_0, v_0);
 	k[0] = mul(f(r_0, v_0), h);
 	l[0] = mul(g(r_0, v_0, masses), h);
+	l[0][2] = 0;
 	k[1] = mul(f(add(r_0, mul(k[0], 1 / 2)), add(v_0, mul(l[0], 1 / 2))), h);
 	l[1] = mul(g(add(r_0, mul(k[0], 1 / 2)), add(v_0, mul(l[0], 1 / 2)), masses), h);
+	l[1][2] = 0;
 	k[2] = mul(f(add(r_0, mul(k[1], 3 / 4)), add(v_0, mul(l[1], 3 / 4))), h);
 	l[2] = mul(g(add(r_0, mul(k[1], 3 / 4)), add(v_0, mul(l[1], 3 / 4)), masses), h);
+	l[2][2] = 0;
 	r_1 = add(r_0, add3(mul(k[0], 2 / 9), mul(k[1], 1 / 3), mul(k[2], 4 / 9)));
 	v_1 = add(v_0, add3(mul(l[0], 2 / 9), mul(l[1], 1 / 3), mul(l[2], 4 / 9)));
 	k[3] = mul(f(r_1, v_1), h);
 	l[3] = mul(g(r_1, v_1, masses), h);
+	l[3][2] = 0;
 
 	r_1s = sum(r_0, mul(k[0], -5 / 72), mul(k[1], 1 / 12), mul(k[2], 1 / 9), mul(k[3], -1 / 8));
 	v_1s = sum(v_0, mul(l[0], -5 / 72), mul(l[1], 1 / 12), mul(l[2], 1 / 9), mul(l[3], -1 / 8));

@@ -14,7 +14,7 @@ const z = 3;
 const masses: Mass[] = [];
 const mass1: Mass = { pos: [100, 200, z], m: 100, color: "#fa6670" };
 const mass2: Mass = { pos: [200, 100, z], m: 100, color: "#1fc7ff" };
-const mass3: Mass = { pos: [300, 200, z], m: 100, color: "#8bfa66" };
+const mass3: Mass = { pos: [300, 250, z], m: 50, color: "#8bfa66" };
 
 masses.push(mass1, mass2, mass3);
 
@@ -28,22 +28,22 @@ for (let i = 0; i < canvas.width; i += constants.size) {
 	for (let j = 0; j < canvas.height; j += constants.size) {
 		const x = j + constants.size / 2;
 
-		// let r = [x, y, 0];
-		// const r_final = integrate(r, masses, ctx);
-		// const closest = closest_mass(r_final, masses);
+		let r = [x, y, 0];
+		const r_final = integrate(r, masses, ctx);
+		const closest = closest_mass(r_final, masses);
 
-		// if ((abs(subtract(r_final, closest.pos)) as number) > 15) {
-		// 	err_count++;
-		// }
+		if ((abs(subtract(r_final, closest.pos)) as number) > 15) {
+			err_count++;
+		}
 
-		// ctx.fillStyle = closest.color;
-		// ctx.fillRect(x - constants.size / 2, y - constants.size / 2, constants.size, constants.size);
+		ctx.fillStyle = closest.color;
+		ctx.fillRect(x - constants.size / 2, y - constants.size / 2, constants.size, constants.size);
 
-		// finals.push(r_final);
+		finals.push(r_final);
 		count++;
-		break;
+		// break;
 	}
-	break;
+	// break;
 }
 console.log("total count: ", count);
 console.log("error count: ", err_count);
@@ -71,7 +71,6 @@ canvas_data = ctx.getImageData(0, 0, canvas.width, canvas.height);
 canvas.addEventListener("click", (e: MouseEvent) => {
 	const x = e.offsetX;
 	const y = e.offsetY;
-	console.log(x, y);
 	ctx.putImageData(canvas_data, 0, 0);
 	ctx.fillStyle = "white";
 	integrate([x, y, 0], masses, ctx, true);

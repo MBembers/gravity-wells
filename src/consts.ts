@@ -9,9 +9,9 @@ export const bogacki = {
 	nodes: [0, 1 / 2, 3 / 4, 1],
 };
 
-const size = 10;
+const size = 5;
 const h = 0.2;
-const max_steps = 300;
+const max_steps = 200;
 const G = 6.674 * 10;
 const b = 0.1;
 const epsilon = 0.1;
