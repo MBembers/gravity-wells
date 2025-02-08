@@ -1,6 +1,7 @@
-import { Constants, Mass } from "./types.ts";
+import { Mass } from "./types.ts";
 import { subtract, abs } from "./vector_math.ts";
 import { closest_mass, integrate } from "./calculations.ts";
+import { constants } from "./consts.ts";
 
 const canvas = document.querySelector("#sim-canvas") as HTMLCanvasElement;
 canvas.width = 400;
@@ -9,17 +10,8 @@ const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 ctx.fillStyle = "black";
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-const size = 5;
-const h = 0.2;
-const max_steps = 300;
 const z = 3;
-const G = 6.674 * 10;
-const b = 0.1;
-const epsilon = 0.1;
 const masses: Mass[] = [];
-
-const constants: Constants = { h, G, b, epsilon, max_steps, size };
-
 const mass1: Mass = { pos: [100, 200, z], m: 100, color: "#fa6670" };
 const mass2: Mass = { pos: [200, 100, z], m: 100, color: "#1fc7ff" };
 const mass3: Mass = { pos: [300, 200, z], m: 100, color: "#8bfa66" };
@@ -31,25 +23,27 @@ let err_count = 0;
 let finals: number[][] = [];
 let canvas_data: ImageData;
 
-for (let i = 0; i < canvas.width; i += size) {
-	const y = i + size / 2;
-	for (let j = 0; j < canvas.height; j += size) {
-		const x = j + size / 2;
+for (let i = 0; i < canvas.width; i += constants.size) {
+	const y = i + constants.size / 2;
+	for (let j = 0; j < canvas.height; j += constants.size) {
+		const x = j + constants.size / 2;
 
-		let r = [x, y, 0];
-		const r_final = integrate(r, masses, constants, ctx);
-		const closest = closest_mass(r_final, masses);
+		// let r = [x, y, 0];
+		// const r_final = integrate(r, masses, ctx);
+		// const closest = closest_mass(r_final, masses);
 
-		if ((abs(subtract(r_final, closest.pos)) as number) > 15) {
-			err_count++;
-		}
+		// if ((abs(subtract(r_final, closest.pos)) as number) > 15) {
+		// 	err_count++;
+		// }
 
-		ctx.fillStyle = closest.color;
-		ctx.fillRect(x - size / 2, y - size / 2, size, size);
+		// ctx.fillStyle = closest.color;
+		// ctx.fillRect(x - constants.size / 2, y - constants.size / 2, constants.size, constants.size);
 
-		finals.push(r_final);
+		// finals.push(r_final);
 		count++;
+		break;
 	}
+	break;
 }
 console.log("total count: ", count);
 console.log("error count: ", err_count);
@@ -74,9 +68,11 @@ finals.forEach((r) => {
 });
 canvas_data = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-canvas.addEventListener("mousemove", (e: MouseEvent) => {
+canvas.addEventListener("click", (e: MouseEvent) => {
 	const x = e.offsetX;
 	const y = e.offsetY;
+	console.log(x, y);
 	ctx.putImageData(canvas_data, 0, 0);
-	integrate([x, y, 0], masses, constants, ctx, true);
+	ctx.fillStyle = "white";
+	integrate([x, y, 0], masses, ctx, true);
 });
